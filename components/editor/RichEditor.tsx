@@ -42,14 +42,11 @@ export default function RichEditor({ content, onChange }: Props) {
   }, [editor])
 
   async function insertImage(file: File) {
-    const res = await fetch('/api/upload', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ filename: file.name, contentType: file.type }),
-    })
-    const { presignedUrl, publicUrl } = await res.json()
-    await fetch(presignedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
-    editor?.chain().focus().setImage({ src: publicUrl }).run()
+    const fd = new FormData()
+    fd.append('file', file)
+    const res = await fetch('/api/upload', { method: 'POST', body: fd })
+    const { publicUrl } = await res.json()
+    if (publicUrl) editor?.chain().focus().setImage({ src: publicUrl }).run()
   }
 
   if (!editor) return null

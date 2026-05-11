@@ -35,14 +35,14 @@ export default function ArticleForm({ categories, article }: { categories: Categ
   async function uploadCover(file: File) {
     setUploading(true)
     try {
-      const res = await fetch('/api/upload', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ filename: file.name, contentType: file.type }),
-      })
-      const { presignedUrl, publicUrl } = await res.json()
-      await fetch(presignedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } })
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetch('/api/upload', { method: 'POST', body: fd })
+      const { publicUrl, error } = await res.json()
+      if (error) throw new Error(error)
       setCoverUrl(publicUrl)
+    } catch (e: any) {
+      setError(e.message)
     } finally {
       setUploading(false)
     }
