@@ -26,7 +26,7 @@ async function getArticles(categorySlug?: string) {
   const supabase = await createClient()
   let query = supabase
     .from('articles')
-    .select('id, title, slug, cover_image_url, view_count, read_time_minutes, published_at, categories(name, slug), profiles(full_name)')
+    .select('id, title, slug, cover_image_url, view_count, read_time_minutes, published_at, user_id, categories(name, slug)')
     .eq('status', 'published')
     .order('published_at', { ascending: false })
     .limit(12)
@@ -138,7 +138,6 @@ export default async function HomePage({
                 <div className="flex items-center gap-3.5 text-xs text-[#7a7770] mt-4 pt-3.5 border-t border-[#e4e2dc]">
                   <span>👁 {fmtNum(a.view_count)}</span>
                   <span>⏱ {a.read_time_minutes} min</span>
-                  <span>{(a.profiles as any)?.full_name}</span>
                 </div>
               </Link>
             ))}

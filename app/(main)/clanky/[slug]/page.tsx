@@ -12,13 +12,19 @@ interface Props {
 
 async function getArticle(slug: string) {
   const supabase = await createClient()
-  const { data } = await supabase
+  const { data: article } = await supabase
     .from('articles')
-    .select('*, categories(name, slug), profiles(full_name)')
+    .select('*, categories(name, slug)')
     .eq('slug', slug)
     .eq('status', 'published')
     .single()
-  return data
+  if (!article) return null
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('full_name')
+    .eq('id', article.user_id)
+    .maybeSingle()
+  return { ...article, profiles: profile }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {

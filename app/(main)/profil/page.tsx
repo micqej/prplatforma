@@ -13,7 +13,7 @@ export default async function ProfilPage() {
     supabase.from('profiles').select('*').eq('id', user.id).single(),
     supabase
       .from('articles')
-      .select('id, title, slug, view_count, published_at, status, categories(name), article_views(id, viewed_at)')
+      .select('id, title, slug, view_count, published_at, status, category_id, categories(name), article_views(id, viewed_at)')
       .eq('user_id', user.id)
       .order('published_at', { ascending: false }),
   ])
