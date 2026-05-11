@@ -19,12 +19,21 @@ export default function RegisterPage() {
     setError('')
     if (password.length < 8) { setError('Heslo musí mať aspoň 8 znakov'); return }
     setLoading(true)
-    const { error: err } = await supabase.auth.signUp({
+    const { data, error: err } = await supabase.auth.signUp({
       email,
       password,
       options: { data: { full_name: fullName } },
     })
     if (err) { setError(err.message); setLoading(false); return }
+    // email is auto-confirmed server-side — sign in immediately
+    if (data.session) {
+      router.push('/pridat')
+      router.refresh()
+      return
+    }
+    // fallback: try signing in directly
+    const { error: signInErr } = await supabase.auth.signInWithPassword({ email, password })
+    if (signInErr) { setError('Účet vytvorený, prihlás sa manuálne.'); setLoading(false); return }
     router.push('/pridat')
     router.refresh()
   }
